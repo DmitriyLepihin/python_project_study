@@ -55,4 +55,4 @@ for i in s:
         b += i.lower()
 print(b)
 
-dsk
+dsk,nbv
