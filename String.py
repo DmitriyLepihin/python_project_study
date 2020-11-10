@@ -54,5 +54,3 @@ for i in s:
     else:
         b += i.lower()
 print(b)
-
-dsk,nbv
