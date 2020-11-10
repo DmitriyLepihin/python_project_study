@@ -25,7 +25,7 @@ for i in a:
 
 # задание №7
 s = 'HeLlOwOrLd'
-
+print(s.swapcase())
 
 print(s)
 
