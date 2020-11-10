@@ -25,10 +25,17 @@ for i in a:
 
 # задание №7
 s = 'HeLlOwOrLd'
-print(s.replace('HeLlOwOrLd', 'hElLoWoRlD'))
+for i in range(len(s) - 1):
+    t = s[i]
+    g = s[i + 1]
+    if g != t:
+        t.lower()
+        g.upper()
+print(s)
 
-# задание №8
-print('h23ev9l=7lero[] fnwwqopfrfilxpd]e'.count('e'))
+# задание №8 (измененное решение)
+a = 'h23ev9l=7lero[] fnwwqopfrfilxpd]e'
+print(a[0:-1:3])
 
 # задание №9
 s = 'jkds8esfie9sdfljsdl1'
