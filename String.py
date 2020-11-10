@@ -44,3 +44,13 @@ print(s.isalnum())
 # задание № 11
 a = 'Hello '
 print(a * 3)
+
+# задание № 12
+s = 'HeLlOwOrLd'
+b = ''
+for i in s:
+    if i.islower():
+        b += i.upper()
+    else:
+        b += i.lower()
+print(b)
