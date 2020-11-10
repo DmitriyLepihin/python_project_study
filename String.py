@@ -12,7 +12,7 @@ print(s.capitalize())
 
 # задание № 4
 s = '       hello world      '
-print(s.lstrip().rstrip())
+print(s.strip())
 
 # задание №5
 s = 'h23ev9l=7lero[] fnwwqopfrfilxpd]e'
