@@ -25,12 +25,8 @@ for i in a:
 
 # задание №7
 s = 'HeLlOwOrLd'
-for i in range(len(s) - 1):
-    t = s[i]
-    g = s[i + 1]
-    if g != t:
-        t.lower()
-        g.upper()
+
+
 print(s)
 
 # задание №8 (измененное решение)
