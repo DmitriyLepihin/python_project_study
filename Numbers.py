@@ -1,43 +1,39 @@
-#  задание №1
-a = 'Hello'
-b = 'World'
-print(a, b)
+# задание № 1
+# числа бывают целыми (int) и с плавующей точкой (float)
 
-# задание №2
-print('HeLLo WORLd'.lower())
+# задание № 2
+a = 1232 + 2321
+print(a)
 
-# задание №3
-s = 'hello world'
-print(s.capitalize())
+# задание № 3
+a = 1232 * 2321
+print(a)
 
 # задание № 4
-s = '       hello world      '
-print(s.lstrip().rstrip())
+a = 1232 ** 32
+print(a)
 
-# задание №5
-s = 'h23ev9l=7lero[] fnwwqopfrfilxpd]e'
-print(s.replace('h23ev9l=7lero[] fnwwqopfrfilxpd]e', 'hello world'))
+# задание № 5
+a = 1232 // 13
+b = 1232 / 13
+print(a, '\n', b)
 
-# задание №6
-a = 'hello world'
-for i in a:
-    print(i)
+# задание № 6
+a = 1232 % 13
+print(a)
 
-# задание №7
-s = 'HeLlOwOrLd'
-print(s.replace('HeLlOwOrLd', 'hElLoWoRlD'))
+# задание № 7
+a = 1232 - 2321
+print(a)
 
-# задание №8
-print('h23ev9l=7lero[] fnwwqopfrfilxpd]e'.count('e'))
+# задание № 8
+a = str(1232)
+print(a)
 
-# задание №9
-s = 'jkds8esfie9sdfljsdl1'
-print(s.isalnum())
+# задание № 9
+a = int('1232')
+print(a)
 
-# задание №10
-b = '92a38402830n948'
-print(s.isalnum())
-
-# задание № 11
-a = 'Hello '
-print(a * 3)
+# задание № 10
+a = float('1232')
+print(a)
