@@ -38,7 +38,7 @@ for i in range(len(a)):
         cnt += 1
 print(cnt)
 
-# задание № 9
+# задание № 9 (скорее всего решил не очень)
 a = ['H', 'e', 'l', 'l', 'o']
 for i in range(len(a)):
     c = ''
