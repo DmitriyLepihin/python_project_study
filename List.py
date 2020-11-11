@@ -39,10 +39,17 @@ for i in range(len(a)):
 print(cnt)
 
 # задание № 9
-# сделать из списка a = [‘H’, ‘e’, ‘l’, ‘l’, ‘o’] строку  “H+e+l+l+o”
 a = ['H', 'e', 'l', 'l', 'o']
-b = ''
-b.jo
+for i in range(len(a)):
+    c = ''
+    if a[-1] != a[i]:
+        c += a[i]
+        print(c, end='+')
+    else:
+        c += a[-1]
+        print(c, end='')
+print()
+
 # задание № 10
 a = [1, 2, 3, 4, 5]
 b = ['a', 'b', 'c']
