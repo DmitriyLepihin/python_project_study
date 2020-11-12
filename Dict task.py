@@ -14,5 +14,5 @@ d['t'] = 1000
 print(d)
 # задание № 14
 a = [1, 2, 3, 4]
-d = dict.fromkeys([a[0], a[1], a[2], a[3]])
+d = dict.fromkeys([a[0], a[1], a[2], a[3]]) # не уверен что оптимально
 print(d, type(d))

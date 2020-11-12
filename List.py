@@ -68,4 +68,3 @@ b = a
 b = a.copy()
 a[2] = b
 print(a)
-
