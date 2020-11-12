@@ -4,7 +4,7 @@ d = {'a': 1, 'b': 2}
 print(d['b'])
 # задание № 3
 d = {'a': 1, 'b': 2}
-print(d)
+print(d.keys())
 # задание № 4
 d = {'a': 1, 'b': 2}
 print(d['a'], d['b'])
