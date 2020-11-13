@@ -1,4 +1,4 @@
-#  задание №1
+# задание №1
 a = 'Hello'
 b = 'World'
 print(a, b)
