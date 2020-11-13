@@ -41,6 +41,7 @@ print(s.isalnum())
 b = '92a38402830n948'
 print(s.isalnum())
 
+
 # задание № 11
 a = 'Hello '
 print(a * 3)
