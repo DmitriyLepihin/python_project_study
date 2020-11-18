@@ -12,7 +12,7 @@ for elem in a:
         elem.update({'a': 'new key'})
 print(a)
 
-# второй варинат решения задачи
+# задание № 2 (второй варинат решения)
 a = [1, 'a', [1, 2, 3], {1: 2}, (1, 2, 3,), {'a': 'old key'}]
 for elem in a:
     if isinstance(elem, dict):
@@ -25,7 +25,7 @@ if len(b) > 9:
     print(b[0:9])
 if len(b) < 9:
     b += '123456789'[len(b)::]
-    print(b)
+    print(' '.join(b))
 
 # задание № 4
 a = 89
@@ -36,29 +36,13 @@ if a == 89:
 if a < 89:
     print('equal')
 
-# задание 5  супер-говно :( но выводит все как надо
-# конечно можно обмануть всех -> b = a.replace( 'hello') но этот метод не для этого
+# задание 5
 a = 'skdhlzx;hfkhsnkeluewrtyeruopvcwqsnewfawhrevnetrvnoesrvpser'
-b = ''
-for i in a:
-    if i == 'h' or i == 'e':
-        b += i
-    if i == 'l' or i == 'o':
-        b += i
-print(b.count('h'), b.count('e'), b.count('l'), b.count('o'))
-c = b.replace('h', '', 3).replace('e', '', 7).replace('o', '', 1)
-letter_one = ''
-letter_two = ''
-leter_three = ''
-leter_four = ''
-for j in c:
-    if j == 'h':
-        letter_one += j
-    if j == 'e':
-        letter_two += j
-    if j == 'l':
-        leter_three += j
-    if j == 'o':
-        leter_four += j
-word = letter_one + letter_two + leter_three + leter_four
-print(word)
+b = 'hello'
+for letter in b:
+    if letter in a:
+        b = b.replace(letter, '')
+if len(b) == 0:
+    print('It is possible to form a word')
+else:
+    print('It is impossible to form a word')
