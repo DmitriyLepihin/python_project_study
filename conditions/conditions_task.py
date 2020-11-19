@@ -19,22 +19,28 @@ for elem in a:
         elem.update({'a': 'new key'})
 print(a)
 
-# задание 3
+# задание № 3
 b = input()
+c = '123456789'
+d = len(b)
+f = ''
 if len(b) > 9:
-    print(b[0:9])
+    print(b[-9::])
 if len(b) < 9:
-    b += '123456789'[len(b)::]
-    print(' '.join(b))
+    for i in range(len(c) - len(b)):
+        d += 1
+        f += (str(d))
+    f = ' '.join(f)
+    print(b + f)
 
 # задание № 4
 a = 89
 if a > 89:
     print('bigger')
 if a == 89:
-    print('less')
-if a < 89:
     print('equal')
+if a < 89:
+    print('less')
 
 # задание 5
 a = 'skdhlzx;hfkhsnkeluewrtyeruopvcwqsnewfawhrevnetrvnoesrvpser'
@@ -46,3 +52,22 @@ if len(b) == 0:
     print('It is possible to form a word')
 else:
     print('It is impossible to form a word')
+
+# задача № 6
+a = 'some'
+b = '99999999999999Some9999999'
+b = b.lower()
+if a in b:
+    print(b.replace('some', 'HouSe'))
+else:
+    print('Variable not found')
+
+# задание 7
+a = 'dkfjoiewjvoelistsfjskdejf'
+if 'list' in a:
+    a = a.split()
+if 'set' in a:
+    a = set(a)
+if 'tuple' in a:
+    a = tuple(a)
+print(a, type(a))
