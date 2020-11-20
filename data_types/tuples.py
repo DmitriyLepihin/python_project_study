@@ -1,4 +1,4 @@
-# задание № 1
+# задача № 1
 a = 'Test string'  # можно a = tuple('Test string')
 b = tuple(a)
 print(b)
