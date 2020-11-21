@@ -103,11 +103,9 @@ print(vowels, consonants)
 
 # задание 10. подбил все цифры вне зависимости повторяются они или нет
 a = '39846789857394845793857193874593485'
-# summ_numbers = set()
 summ_numbers = ''
 for i in a:
     if int(i) % 2 == 0 or int(i) % 3 == 0:
-        # summ_numbers.add(i)
         summ_numbers += i
 
 summ_numbers = len(summ_numbers)
