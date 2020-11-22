@@ -103,20 +103,27 @@ print(vowels, consonants)
 
 # задание 10. подбил все цифры вне зависимости повторяются они или нет
 a = '39846789857394845793857193874593485'
-summ_numbers = ''
+summ_numbers_2 = ''
+summ_numbers_3 = ''
 for i in a:
-    if int(i) % 2 == 0 or int(i) % 3 == 0:
-        summ_numbers += i
-
-summ_numbers = len(summ_numbers)
-print(summ_numbers)
+    if int(i) % 2 == 0:
+        summ_numbers_2 += i
+    if int(i) % 3 == 0:
+        summ_numbers_3 += i
+summ_numbers_2 = len(summ_numbers_2)
+summ_numbers_3 = len(summ_numbers_3)
+print(summ_numbers_2, summ_numbers_3)
 
 # задание № 10. второй варинат решения подбил все без повторов.
 a = '39846789857394845793857193874593485'
-summ_numbers = set()
+summ_numbers_2 = set()
+summ_numbers_3 = set()
 for i in a:
-    if int(i) % 2 == 0 or int(i) % 3 == 0:
-        summ_numbers.add(i)
+    if int(i) % 2 == 0:
+        summ_numbers_2.add(i)
+    if int(i) % 3 == 0:
+        summ_numbers_3.add(i)
 
-summ_numbers = len(summ_numbers)
-print(summ_numbers)
+summ_numbers_2 = len(summ_numbers_2)
+summ_numbers_3 = len(summ_numbers_3)
+print(summ_numbers_2, summ_numbers_3)
