@@ -103,15 +103,13 @@ print(vowels, consonants)
 
 # задание 10. подбил все цифры вне зависимости повторяются они или нет
 a = '39846789857394845793857193874593485'
-summ_numbers_2 = ''
-summ_numbers_3 = ''
+summ_numbers_2 = 0
+summ_numbers_3 = 0
 for i in a:
     if int(i) % 2 == 0:
-        summ_numbers_2 += i
+        summ_numbers_2 += 1
     if int(i) % 3 == 0:
-        summ_numbers_3 += i
-summ_numbers_2 = len(summ_numbers_2)
-summ_numbers_3 = len(summ_numbers_3)
+        summ_numbers_3 += 1
 print(summ_numbers_2, summ_numbers_3)
 
 # задание № 10. второй варинат решения подбил все без повторов.
