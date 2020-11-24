@@ -43,20 +43,11 @@ print(b)
 # задание № 4
 a = {'fruit': {'banan': {'price': 100, 'count': 1}}, 'vegitable': {'potato': {'price': 78, 'count': 3}}}
 basket = []
-profit = 1
-profit_2 = 1
 summ_profit = 0
 for key in a.keys():
     for value in a[key].values():
         basket.append(value)
-for elem in basket:
-    if type(elem) == dict:
-        for key in elem.keys():
-            if profit == 1:
-                profit = elem[key]*profit
-            else:
-                profit_2 = elem[key] * profit_2
-                summ_profit = profit + profit_2
+summ_profit = basket[0]['price'] * basket[0]['count'] + basket[1]['price'] * basket[1]['count']
 print(summ_profit)
 
 # задание № 5
