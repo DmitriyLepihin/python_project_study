@@ -71,3 +71,57 @@ if 'set' in a:
 if 'tuple' in a:
     a = tuple(a)
 print(a, type(a))
+
+# задание № 8
+a = [{'2': [1, 2, 4, 5]}, 'dima', list('1,2,3,4'), 3, 2]
+for elem in a:
+    if type(elem) == int and elem % 2 == 0:
+        print(elem)
+
+# задание № 9 подбил все буквы вне зависимости повторяются они или нет.
+a = 'asadsfjsdfusehfuishezvblkaufhsdnvsidnuseuesfhd'
+vowels = 0
+consonants = 0
+for letter in a:
+    if letter in 'aeiouy':
+        vowels += 1
+    else:
+        consonants += 1
+print(vowels, consonants)
+
+# 9 второй варинат решения (только буквы которые не повторяются)
+a = 'asadsfjsdfusehfuishezvblkaufhsdnvsidnuseuesfhd'
+my_set_a = set(a)
+vowels = 0
+consonants = 0
+for letter in my_set_a:
+    if letter in 'aeiouy':
+        vowels += 1
+    else:
+        consonants += 1
+print(vowels, consonants)
+
+# задание 10. подбил все цифры вне зависимости повторяются они или нет
+a = '39846789857394845793857193874593485'
+summ_numbers_2 = 0
+summ_numbers_3 = 0
+for i in a:
+    if int(i) % 2 == 0:
+        summ_numbers_2 += 1
+    if int(i) % 3 == 0:
+        summ_numbers_3 += 1
+print(summ_numbers_2, summ_numbers_3)
+
+# задание № 10. второй варинат решения подбил все без повторов.
+a = '39846789857394845793857193874593485'
+summ_numbers_2 = set()
+summ_numbers_3 = set()
+for i in a:
+    if int(i) % 2 == 0:
+        summ_numbers_2.add(i)
+    if int(i) % 3 == 0:
+        summ_numbers_3.add(i)
+
+summ_numbers_2 = len(summ_numbers_2)
+summ_numbers_3 = len(summ_numbers_3)
+print(summ_numbers_2, summ_numbers_3)
