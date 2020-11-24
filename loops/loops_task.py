@@ -90,60 +90,21 @@ while a[0] <= 3:
                         b.append(a[2])
 print(b)
 
-# задание № 8 (такое себе)
-a = 1
-while a <= 5:
-    b = '+' * a
-    print(b.center(10))
-    a += 2
-    if a == 3:
-        b = '+' * a
-        print(b.center(10))
-        a += 2
-    if a == 5:
-        b = '+' * a
-        print(b.center(10))
-        break
-while a <= 5:
-    a -= 2
-    b = '+' * a
-    print(b.center(10))
-    a -= 2
-    if a == 1:
-        b = '+' * a
-        print(b.center(10))
-        break
+# задание № 8
 
 a = '+'
-n = 5
-middle = (n - 1) / 2 + 1
-count = 1
-for i in range(n + 1):
-    if i < middle - 1:
-        picture = a * count
-        print(picture.center(n * 2))
-        count += 2
-    if i == middle:
-        picture = a * n
-        print(picture.center(n * 2))
-    if i > middle:
-        count -= 2
-        picture = a * count
-        print(picture.center(n * 2))
-
-stars = '+'
 size = 5
-middle = (size - 1) // 2 + 1
+middle = (size - 1) / 2 + 1
 count = 1
 for i in range(size + 1):
     if i < middle - 1:
-        picture = stars * count
-        count += 2
+        picture = a * count
         print(picture.center(size * 2))
+        count += 2
     if i == middle:
-        picture = stars * count
+        picture = a * size
         print(picture.center(size * 2))
     if i > middle:
         count -= 2
-        picture = stars * count
+        picture = a * count
         print(picture.center(size * 2))
