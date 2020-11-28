@@ -27,6 +27,9 @@ for elem in a:
     if type(elem) == int:
         b.append(elem)
         a.remove(elem)
+    if elem == str:
+        b.append(elem)
+        a.remove(elem)
 for elem in a:
     if type(elem) == str:
         b.append(elem)
@@ -40,15 +43,35 @@ for elem in a:
         b.append(elem)
 print(b)
 
+# задание № 3 (второй вариант) я пытался сделать через счетчик и insert(), получилось только под данное условие
+a = [1, [1, 2, 3], 'a', {1: 1}, [5, 6], 9, 'b']
+b = []
+numbers = []
+strings = []
+lists = []
+dicts = []
+for elem in a:
+    if type(elem) == int:
+        numbers.append(elem)
+    if type(elem) == str:
+        strings.append(elem)
+    if type(elem) == list:
+        lists.append(elem)
+    if type(elem) == dict:
+        dicts.append(elem)
+b.extend(numbers)
+b.extend(strings)
+b.extend(lists)
+b.extend(dicts)
+print(b)
+
 # задание № 4
 a = {'fruit': {'banan': {'price': 100, 'count': 1}}, 'vegitable': {'potato': {'price': 78, 'count': 3}}}
-basket = []
-summ_profit = 0
+profit = 0
 for key in a.keys():
     for value in a[key].values():
-        basket.append(value)
-summ_profit = basket[0]['price'] * basket[0]['count'] + basket[1]['price'] * basket[1]['count']
-print(summ_profit)
+        profit += value['price'] * value['count']
+print(profit)
 
 # задание № 5
 a = 20
@@ -71,18 +94,34 @@ while a[0] <= 3:
     a[0] += 0.546
     if a[0] >= 3:
         b.append(a[0])
-        while a[1] <= 30:
-            a[1] += 0.546
-            if a[1] >= 30:
-                b.append(a[1])
-                while a[2] <= 300:
-                    a[2] += 0.546
-                    if a[2] >= 300:
-                        b.append(a[2])
+while a[1] <= 30:
+    a[1] += 0.546
+    if a[1] >= 30:
+        b.append(a[1])
+while a[2] <= 300:
+    a[2] += 0.546
+    if a[2] >= 300:
+        b.append(a[2])
 print(b)
 
-# задание № 8
+# задание №7 второй вариант
+a = [1, 10, 100]
+for elem in range(len(a)):
+    check_number = a[elem] * 3
+    while a[elem] <= check_number:
+        a[elem] += 0.546
+        if a[elem] >= check_number:
+            break
+print(a)
 
+# задание № 8
+a = [1, 10, 100]
+for i in range(len(a)):
+    n = a[i] * 3 // 0.546
+    a[i] += 0.546 * n
+print(a)
+
+# задание № 9
 a = '+'
 size = 5
 middle = (size - 1) / 2 + 1
