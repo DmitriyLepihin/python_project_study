@@ -77,6 +77,28 @@ for elem in a:
         print()
 print(b)
 
+# задание 3 (третий вариант)
+a = [1, [1, 2, 3], 'a', {1: 1}, [5, 6], 9, 'b']
+b = []
+numbers = []
+strings = []
+lists = []
+dicts = []
+for elem in a:
+    if type(elem) == int:
+        numbers.append(elem)
+    if type(elem) == str:
+        strings.append(elem)
+    if type(elem) == list:
+        lists.append(elem)
+    if type(elem) == dict:
+        dicts.append(elem)
+b.extend(numbers)
+b.extend(strings)
+b.extend(lists)
+b.extend(dicts)
+print(b)
+
 # задание № 4
 a = {'fruit': {'banan': {'price': 100, 'count': 1}}, 'vegitable': {'potato': {'price': 78, 'count': 3}}}
 profit = 0
