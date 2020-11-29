@@ -43,26 +43,38 @@ for elem in a:
         b.append(elem)
 print(b)
 
-# задание № 3 (второй вариант) я пытался сделать через счетчик и insert(), получилось только под данное условие
+# задание № 3 (второй вариант)
+INDEX_INT = 0
 a = [1, [1, 2, 3], 'a', {1: 1}, [5, 6], 9, 'b']
 b = []
-numbers = []
-strings = []
-lists = []
-dicts = []
+count_int = 0
+count_str = 0
+count_list = 0
 for elem in a:
     if type(elem) == int:
-        numbers.append(elem)
+        b.insert(INDEX_INT, elem)
+        count_int += 1
+        print()
     if type(elem) == str:
-        strings.append(elem)
+        b.insert(count_int, elem)
+        count_str = count_int + 1
+        print()
     if type(elem) == list:
-        lists.append(elem)
+        if count_int == 0:
+            count_list = count_int
+            b.insert(count_list, elem)
+            continue
+        if count_str == 0 and count_list == 0:
+            count_list = count_int
+        elif count_str == 0:
+            count_list = count_int + 1
+        else:
+            count_list = count_str + 1
+        b.insert(count_list, elem)
+        print()
     if type(elem) == dict:
-        dicts.append(elem)
-b.extend(numbers)
-b.extend(strings)
-b.extend(lists)
-b.extend(dicts)
+        b.append(elem)
+        print()
 print(b)
 
 # задание № 4
@@ -104,7 +116,7 @@ while a[2] <= 300:
         b.append(a[2])
 print(b)
 
-# задание №7 второй вариант
+# задание №7 (второй вариант)
 a = [1, 10, 100]
 for elem in range(len(a)):
     check_number = a[elem] * 3
