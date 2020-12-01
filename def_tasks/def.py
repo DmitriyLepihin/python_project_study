@@ -72,6 +72,12 @@ def create_dict(n):
     return my_dict
 
 
+# задание № 4 (второй вариант)
+def create_dict2(n):
+    dicts = dict.fromkeys(n[2::3])  # подумал, что это будет лучше - не прогоняем цикл и ничего не добавляем в список
+    return dicts  # а сразу работаем с поданной строкой
+
+
 # задание № 5
 def times():
     n = datetime.now()
@@ -103,6 +109,7 @@ greetings2(25)
 rec_greetings(25)
 draws(7)
 print(word_search('skdhlzx;hfkhsnkeluewritymeruopvacwqsnewfawhrevnetrvnoesrvpser', 'hello'))
+print(create_dict2('fhsefisdvdsufbsdkbvjhsdfbvshdbv'))
 print(create_dict('fhsefisdvdsufbsdkbvjhsdfbvshdbv'))
 print(times())
 print(day_of_week())
