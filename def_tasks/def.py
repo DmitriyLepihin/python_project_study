@@ -1,4 +1,5 @@
 from datetime import datetime
+from os import path
 
 
 # задание № 1
@@ -104,6 +105,61 @@ def define_methods(n):
     return dir(n)
 
 
+# задание 9
+def addition(n):
+    n += 13
+    return str(n)
+
+
+# задание 10
+def trim_add(n):
+    if len(n) > 7:
+        return n[:7]
+    if len(n) < 7:
+        while len(n) <= 7:
+            n += n
+        return n[:7]
+
+
+# задание 11
+def create_str(n):
+    for i in range(len(n)):
+        if type(n[i]) == int:
+            n[i] = str(n[i])
+    return ''.join(n)
+
+
+# задание 12
+def create_file(n):
+    if type(n) == int:
+        with open(addition(n), 'a') as file:
+            file.write('Done!')
+    if type(n) == str:
+        with open(trim_add(n), 'a') as file:
+            file.write('Done!')
+    if type(n) == list:
+        with open(create_str(n), 'a') as file:
+            file.write('Done!')
+
+
+# задание 13
+def creating_numbered_files(n):
+    for i in range(1, n + 1):
+        with open(f'new_file_{i}.txt', 'a') as file:
+            file.write('')
+
+
+# задание № 14
+def check_create(n):
+    for i in range(1, n + 1):
+        if path.isfile(f'new_file_{i}.txt'):
+            print(f'new_file_{i}.txt', 'File exists')
+        else:
+            with open(f'new_file_{i}.txt', 'a') as file:
+                file.write('')
+                print(f'new_file_{i}.txt', 'Create new file')
+
+
 greetings(25)
 greetings2(25)
 rec_greetings(25)
@@ -116,3 +172,17 @@ print(day_of_week())
 print(remind())
 d = [1, 2, 3, 4]
 print(define_methods(d))
+number = 0
+string_number = addition(number)
+print(string_number, type(string_number))
+string = 'wert'
+new_string_seven = trim_add(string)
+print(new_string_seven)
+lists = ['sdjvb', 4, 'sldj', 237]
+new_str_lists = create_str(lists)
+print(new_str_lists)
+create_file(0)
+create_file('dima')
+create_file([26, 5, 1991, 'Dima'])
+creating_numbered_files(5)
+check_create(7)
