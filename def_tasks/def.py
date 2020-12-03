@@ -121,8 +121,7 @@ def trim_add(n):
     if len(n) > 7:
         return n[:7]
     if len(n) < 7:
-        while len(n) <= 7:
-            n += n
+        n *= 7
         return n[:7]
 
 
@@ -188,4 +187,3 @@ create_file('dima')
 create_file([26, 5, 1991, 'Dima'])
 creating_numbered_files(5)
 check_create(7)
-
