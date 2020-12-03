@@ -1,7 +1,7 @@
 from product_shop.shop_version_one.utils import opening
 
 
-def greetings_to_the_buyer():
+def main():
     print('Hello, in our prooduct shop. We have:')
     my_shop = opening()
     for key in my_shop.keys():
@@ -13,4 +13,4 @@ def greetings_to_the_buyer():
             print('\t'f"{product}\t{value.get('count')} kg \ton \t{value.get('price')} sum ")
 
 
-greetings_to_the_buyer()
+main()
