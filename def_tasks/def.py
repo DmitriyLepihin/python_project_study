@@ -2,6 +2,11 @@ from datetime import datetime
 from os import path
 
 
+def writing_to_file(n):
+    with open(n, 'w') as file:
+        file.write('Done!')
+
+
 # задание № 1
 def greetings(n):
     word = 'privet'
@@ -116,8 +121,7 @@ def trim_add(n):
     if len(n) > 7:
         return n[:7]
     if len(n) < 7:
-        while len(n) <= 7:
-            n += n
+        n *= 7
         return n[:7]
 
 
@@ -132,20 +136,17 @@ def create_str(n):
 # задание 12
 def create_file(n):
     if type(n) == int:
-        with open(addition(n), 'a') as file:
-            file.write('Done!')
+        writing_to_file(addition(n))
     if type(n) == str:
-        with open(trim_add(n), 'a') as file:
-            file.write('Done!')
+        writing_to_file(trim_add(n))
     if type(n) == list:
-        with open(create_str(n), 'a') as file:
-            file.write('Done!')
+        writing_to_file(create_str(n))
 
 
 # задание 13
 def creating_numbered_files(n):
     for i in range(1, n + 1):
-        with open(f'new_file_{i}.txt', 'a') as file:
+        with open(f'new_file_{i}.txt', 'w') as file:
             file.write('')
 
 
@@ -155,7 +156,7 @@ def check_create(n):
         if path.isfile(f'new_file_{i}.txt'):
             print(f'new_file_{i}.txt', 'File exists')
         else:
-            with open(f'new_file_{i}.txt', 'a') as file:
+            with open(f'new_file_{i}.txt', 'w') as file:
                 file.write('')
                 print(f'new_file_{i}.txt', 'Create new file')
 
