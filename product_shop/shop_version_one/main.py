@@ -1,54 +1,48 @@
-from product_shop.shop_version_one.utils import opening
-from json import dump
+from product_shop.shop_version_one.utils import loading_product_range
+from random import randint
+
+my_shop = loading_product_range()
+wallet = randint(5, 40)
+profit_day = 0
 
 
 def main():
     print('Hello, in our prooduct shop. We have:')
-    my_shop = opening()
-    for key in my_shop.keys():
-        print(key, ':')
-        for product, value in my_shop[key].items():
-            if product == 'total':
-                print('\t', f"{value} sum")
-                continue
-            print('\t'f"{product}\t{value.get('count')} kg \ton \t{value.get('price')} sum ")
+    for key, value in my_shop.items():
+        print('\t'f"{key}\t{value.get('count')} kg \ton \t{value.get('price')} byn - {value.get('type')} ")
+    print('What would you like to buy?')
 
-    def communicate():
-        product = input()
-        product_fruit = ''
-        fruit_kg = 0
-        product_vegetables = ''
-        vegetables_kg = 0
-        if product == 'fruit':
-            print('Ok, what fruit do you want: banana, apple, orange ?')
-            product_name = input()
-            product_fruit += product_name
-            print('How many kg ?')
-            weight = int(input())
-            fruit_kg += weight
-            print(f"Take your {product_fruit} exactly {fruit_kg} kg")
-        if product == 'vegetables':
-            print('Ok, what vegetable do you want: potato, tomato ?')
-            weight = input()
-            product_vegetables += weight
-            print('How many kg ?')
-            weight = int(input())
-            vegetables_kg += weight
-            print(f"Take your {product_vegetables} exactly {vegetables_kg} kg !")
-        for key_shop, value_shop in my_shop.items():
-            if key_shop == 'profit':
-                continue
-            if key_shop == product:
-                for key_product, value_product in my_shop[product].items():
-                    if key_product == product_fruit:
-                        my_shop[product][product_fruit]['count'] = my_shop[product][product_fruit]['count'] - fruit_kg
-                    if key_product == product_vegetables:
-                        my_shop[product][product_vegetables]['count'] = my_shop[product][product_vegetables][
-                                                                            'count'] - vegetables_kg
-        with open('C:\\Users\\User\\PycharmProjects\\pythonProject8\\data_templates\\shop_json', 'w') as file:
-            dump(my_shop, file, indent=3)
 
-    return communicate()
+def write_file(customer):
+    with open('account', 'a') as file:
+        file.write(f"{customer[0]} sold for summ = \
+{my_shop[customer[0]]['price'] * int(customer[1])} byn ({customer[1]} kg)\n")
+
+
+def communicate():
+    purchase_amount = 0
+    global wallet
+    global profit_day
+    while wallet >= 0:
+        if wallet == 0:
+            print(f"You have made all the money purchases. In your wallet {wallet}")
+            break
+        customer = input().lower().split()
+        if customer[0] in my_shop:
+            purchase_amount = my_shop[customer[0]]['price'] * int(customer[1])
+        else:
+            print(f"Sorry {' '.join(customer)} are out of stock!")
+            break
+        if purchase_amount > wallet:
+            print(f"You’ve already spent all your money. Our wallet has {wallet} byn")
+        else:
+            write_file(customer)
+            wallet -= my_shop[customer[0]]['price'] * int(customer[1])
+            purchase_amount = 0
+            profit_day += my_shop[customer[0]]['price'] * int(customer[1])
+    with open('account', 'a') as file:
+        file.write(f"Daily revenue was: {profit_day} byn\n")
 
 
 main()
+communicate()

@@ -1,32 +1,31 @@
 import json
 
 shop = {
-    "fruit": {
-        "banana": {
-            "count": 10,
-            "price": 150
-        },
-        "apple": {
-            "count": 5,
-            "price": 230
-        },
-        "orange": {
-            "count": 13,
-            "price": 137
-        }
+    "banana": {
+        "count": 10,
+        "price": 4,
+        "type": "fruit"
     },
-    "vegetables": {
-        "potato": {
-            "count": 47,
-            "price": 77
-        },
-        "tomato": {
-            "count": 50,
-            "price": 60
-        }
+    "apple": {
+        "count": 5,
+        "price": 6,
+        "type": "fruit"
     },
-    "profit": {
-        "total": 0
+    "orange": {
+        "count": 13,
+        "price": 4,
+        "type": "fruit"
+    },
+
+    "potato": {
+        "count": 47,
+        "price": 1,
+        "type": "vegetables"
+    },
+    "tomato": {
+        "count": 50,
+        "price": 4,
+        "type": "vegetables"
     }
 }
 # перевел в json (стала str)
