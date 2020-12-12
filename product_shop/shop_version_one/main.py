@@ -2,8 +2,6 @@ from product_shop.shop_version_one.utils import loading_product_range
 from random import randint
 
 my_shop = loading_product_range()
-wallet = randint(5, 40)
-profit_day = 0
 
 
 def main():
@@ -13,35 +11,33 @@ def main():
     print('What would you like to buy?')
 
 
-def write_file(customer):
+def write_file(value, text):
     with open('account', 'a') as file:
-        file.write(f"{customer[0]} sold for summ = \
-{my_shop[customer[0]]['price'] * int(customer[1])} byn ({customer[1]} kg)\n")
+        file.write(text)
 
 
 def communicate():
-    purchase_amount = 0
-    global wallet
-    global profit_day
+    wallet = randint(5, 40)
+    profit_day = 0
     while wallet >= 0:
+        purchase_amount = 0
         if wallet == 0:
-            print(f"You have made all the money purchases. In your wallet {wallet}")
+            print(f"You have made all the money purchases. In your wallet {wallet} byn")
             break
-        customer = input().lower().split()
-        if customer[0] in my_shop:
-            purchase_amount = my_shop[customer[0]]['price'] * int(customer[1])
+        order = input().lower().split()
+        if order[0] in my_shop:
+            purchase_amount = my_shop[order[0]]['price'] * int(order[1])
+            if purchase_amount <= wallet:
+                write_file(order, f"{order[0]} sold for summ = \
+{my_shop[order[0]]['price'] * int(order[1])} byn ({order[1]} kg)\n")
+                wallet -= purchase_amount
+                profit_day += purchase_amount
+            else:
+                print(f"You’ve already spent all your money. Our wallet has {wallet} byn")
         else:
-            print(f"Sorry {' '.join(customer)} are out of stock!")
+            print(f"Sorry {' '.join(order)} are out of stock!")
             break
-        if purchase_amount > wallet:
-            print(f"You’ve already spent all your money. Our wallet has {wallet} byn")
-        else:
-            write_file(customer)
-            wallet -= my_shop[customer[0]]['price'] * int(customer[1])
-            purchase_amount = 0
-            profit_day += my_shop[customer[0]]['price'] * int(customer[1])
-    with open('account', 'a') as file:
-        file.write(f"Daily revenue was: {profit_day} byn\n")
+    write_file(profit_day, f"Daily revenue was: {profit_day} byn\n")
 
 
 main()
