@@ -37,11 +37,11 @@ my_py = json.loads(my_json)
 print(my_py)
 
 # создал файл json
-with open('first_json', 'w') as file:
+with open('first.json', 'w') as file:
     json.dump(my_py, file, indent=3)
 
 # взял данные для чтения из json
-with open('first_json', 'r') as file:
+with open('first.json', 'r') as file:
     my_dict_shop = json.load(file)
 
 print(my_dict_shop)
