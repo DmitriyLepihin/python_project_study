@@ -6,16 +6,16 @@ my_shop = loading_product_range()
 
 
 def main():
-    lists_search = []
+    fruits = list(my_shop.values())
+    min_price = fruits[0]['price']
     print('Hello, in our prooduct shop. We have:')
     write_file(f"{datetime.today().strftime('%A %x')} The following products have arrived in the store : \n", 'w')
     for key, value in my_shop.items():
+        if value.get('price') < min_price:
+            min_price = value.get('price')
         print('\t'f"{key}\t{value.get('count')} kg. \ton \t{value.get('price')} byn - {value.get('type')} ")
         write_file('\t'f"{key}\t{value.get('count')} kg. \ton\
 \t{value.get('price')} byn - {value.get('type')}\n", 'a')
-        lists_search.append(value.get('price'))
-    min_price = min(lists_search)
-    lists_search.clear()
     communicate(min_price)
 
 
@@ -29,9 +29,6 @@ def communicate(min_price):
     profit_day = 0
     while True:
         purchase_amount = 0
-        if wallet == 0:
-            print(f"You have made all the money purchases. In your wallet {wallet} byn")
-            break
         if wallet < min_price:
             print(f"You don't have enough money. In your wallet {wallet} byn. Sorry. Try later...")
             break
