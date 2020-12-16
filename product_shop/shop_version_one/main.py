@@ -6,8 +6,8 @@ my_shop = loading_product_range()
 
 
 def main():
-    fruits = list(my_shop.values())
-    min_price = fruits[0]['price']
+    product = list(my_shop.values())
+    min_price = product[0]['price']
     print('Hello, in our prooduct shop. We have:')
     write_file(f"{datetime.today().strftime('%A %x')} The following products have arrived in the store : \n", 'w')
     for key, value in my_shop.items():
