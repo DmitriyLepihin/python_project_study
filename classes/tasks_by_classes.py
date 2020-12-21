@@ -1,13 +1,16 @@
 import random
 
+TYPE_FLOWERS = ['Rose', 'Lily', 'Peony', 'Tulip', 'Orchid', 'Aster']
+COLORS = ['Yellow', 'Blue', 'White', 'Red', 'Pink', 'Purple']
+COLORS_CUBE = ['blue', 'red', 'black', 'white']
+LETTERS = ['d', 'e', 'r', 'y', 'u', 'm', 'p']
+
 
 class Cube:
-    colors = ['blue', 'red', 'black', 'white']
-    letters = ['d', 'e', 'r', 'y', 'u', 'm', 'p']
 
     def __init__(self):
-        self.color = random.choice(self.colors)
-        self.letter = random.choice(self.letters)
+        self.color = random.choice(COLORS_CUBE)
+        self.letter = random.choice(LETTERS)
 
     def __repr__(self):
         return f"{self.color}|{self.letter}"
@@ -27,54 +30,59 @@ class Bag:
 
 class Animal:
 
-    def __init__(self, animal, name, voice, color, eat=0):
+    def __init__(self, animal, name, voice, color):
         self.animal = animal
         self.name = name
         self.voice = voice
         self.color = color
-        self.eat = eat
 
     def feed_animal(self, eat):
-        self.eat += eat
+        print(f"{self.animal}, eating {eat} - om-nom-nom")
 
     def voice_animal(self):
         print(self.voice)
 
+    def __repr__(self):
+        return f"{self.animal}: {self.name}"
+
 
 class Zoo:
+
     def __init__(self):
-        self.zoo = {}
+        pig = Animal('pig', 'Pepa', 'hru', 'pinky')
+        lion = Animal('lion', 'Simba', 'rrr', 'golden')
+        self.zoo = list()
+        self.zoo.append(pig)
+        self.zoo.append(lion)
 
-    def add_animal_zoo(self, animal):
-        self.zoo.setdefault(animal.animal, {'name': animal.name, 'voice': animal.voice, 'color': animal.color})
+    def get_animal(self):
+        return random.choice(self.zoo)
 
 
-pig = Animal('pig', 'Pepa', 'hru', 'pinky')
-lion = Animal('lion', 'Simba', 'rrr', 'golden')
 zoo = Zoo()
-zoo.add_animal_zoo(pig)
-zoo.add_animal_zoo(lion)
+animal = zoo.get_animal()
+animal.voice_animal()
+print(animal)
+animal.feed_animal('apple')
 print(zoo.zoo)
-print(pig.voice)
 
 
 class Flower:
-    type_flowers = ['Rose', 'Lily', 'Peony', 'Tulip', 'Orchid', 'Aster']
-    colors = ['Yellow', 'Blue', 'White', 'Red', 'Pink', 'Purple']
-
     def __init__(self):
-        self.flower = dict()
-        self.flower[random.choice(self.type_flowers)] = random.choice(self.colors)
+        self.flower = random.choice(TYPE_FLOWERS)
+        self.color = random.choice(COLORS)
+
+    def __repr__(self):
+        return f"{self.flower}: {self.color}"
 
 
 class FlowerBed:
 
     def __init__(self):
-        self.flowerbed = {}
-        for i in range(len(Flower.type_flowers)):
+        self.flowerbed = []
+        for i in range(len(TYPE_FLOWERS)):
             flower = Flower()
-            for key, values in flower.flower.items():
-                self.flowerbed.setdefault(key, {'color': values})
+            self.flowerbed.append(flower)
 
 
 flowerbed = FlowerBed()
