@@ -132,7 +132,7 @@ class Administration:
 
     def prolong_book(self, book):
         book = book.upper()
-        if (datetime.now()).date() <= self.reader.card_reader[book]['return date']:
+        if datetime.now().date() <= self.reader.card_reader[book]['return date']:
             print(f"Dear {self.reader.name} {self.reader.surname}, indicate how many days you want to extend the book!")
             self.create_order_amount_of_days()
             self.return_date = self.return_date + timedelta(self.order_amount_of_days)
@@ -148,7 +148,7 @@ class Administration:
  to turn in your book to the library!")
 
     def return_book(self, book):
-        now = (datetime.now()).date()
+        now = datetime.now().date()
         book = book.upper()
         for name_book, info in self.library.library_card.items():
             if name_book == book and now <= info.info_return_date:
