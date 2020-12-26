@@ -11,106 +11,22 @@ BOOKS = {'THE LORD OF THE RINGS': {'author': 'John R. R. Tolkien', 'genre': 'fan
          }
 
 
-class Library:
-    def __init__(self, administrations, readers, orders):
-        self.administration = administrations
-        self.reader = readers
-        self.order = orders
-        self.return_data = str
+class Main:
+    def __init__(self, administrator):
+        self.administrator = administrator
 
     def start_library(self):
-        self.welcome_reader()
-        self.book_availability_info()
-        self.communication_reader()
+        self.administrator.communication_reader()
 
-    def welcome_reader(self):
-        self.administration.parse_books()
-        print('Good day! Dear reader, in our library there are the following books:')
 
-    def book_availability_info(self):
-        self.administration.write_info_library(f"{datetime.today().strftime('%A %x')} \
-the library has the following books: \n", 'w')
-        for key, value in self.administration.books.items():
-            print(f"\t{value.name}: author - {value.author}, genre - {value.genre}")
-            self.administration.write_info_library(f"\t{value.name}: author - {value.author}, genre - {value.genre}\n",
-                                                   'a')
+class Library:
+    def __init__(self):
+        self.library_card = {}
+        self.books = {}
 
-    def checking_the_availability_of_a_book(self):
-        if self.order.name_book in self.administration.books:
-            return self.order.name_book
-        else:
-            return False
-
-    def calculating_the_return_period_of_a_book(self):
-        data_now = datetime.today()
-        period = timedelta(self.order.amount_of_days)
-        self.return_data = (data_now + period).date()
-        return self.return_data
-
-    def communication_reader(self):
-        print(f"{self.reader.name} {self.reader.surname} what book do you want to borrow?")
-        while True:
-            self.order.create_order_book()
-            if self.checking_the_availability_of_a_book():
-                print('Thank you for your order. Indicate the number of days for which you want to take the book!')
-                self.order.create_amount_of_days()
-                self.calculating_the_return_period_of_a_book()
-                self.reader.add_book(self.administration.books[self.order.name_book], self.return_data)
-                del self.administration.books[self.order.name_book]
-                print(f"Ok, you will need to return the book {self.return_data}")
-                self.administration.write_info_library(f"{self.reader.name} {self.reader.surname},\
- took the book - {self.order.name_book}. Return date - {self.return_data}\n", 'a')
-            elif self.order.name_book in self.reader.library_card:
-                print(
-                    f"{self.reader.name} the book {self.order.name_book} is not in our library.\
- It must be passed before {self.reader.library_card[self.order.name_book]['date return']}.\
- Try to come to us after {self.reader.library_card[self.order.name_book]['date return']}! See you later ! ")
-                break
-            else:
-                print(f"{self.reader.name}, the book {self.order.name_book} is not in our library.\
- Maybe she will appear next time. See you later!")
-                break
-
-    def prolong_book(self, reader, book):
-        book = book.upper()
-        if (datetime.now()).date() <= reader.library_card[book]['date return']:
-            print(f"Dear {reader.name} {reader.surname}, indicate how many days you want to extend the book ! ")
-            self.order.create_amount_of_days()
-            self.return_data = self.return_data + timedelta(self.order.amount_of_days)
-            self.reader.library_card[book]['date return'] = self.return_data
-            print(f"Now you need to return the book no later {self.return_data}")
-            self.administration.write_info_library(f"{self.reader.name} {self.reader.surname}, \
- prolong the book - {book} on {self.order.amount_of_days} days. Return date - {self.return_data}\n",
-                                                   'a')
-        else:
-            print(f"{reader.name}, We will not renew the book for you, you are overdue by\
-({(datetime.now()).date() - reader.library_card[book]['date return']})! You urgently need\
- to turn in your book to the library!")
-
-    def return_book(self, reader, book):
-        now = (datetime.now()).date()
-        book = book.upper()
-        for key, value in reader.library_card.items():
-            if key == book and now <= value['date return']:
-                print(f"{reader.name}, maybe you want to renew the book?")
-                renewal_request = input().upper()
-                if renewal_request == 'YES':
-                    self.prolong_book(reader, book)
-                else:
-                    self.administration.books[key] = Book(key, value['author'], value['genre'])
-                    self.administration.write_info_library(f"{reader.name} {reader.surname} returned the book\
- {book} date {now}", 'a')
-                    del reader.library_card[book]
-                    print(f"{reader.name} {reader.surname}, thank you for submitting the book on time.\
- Looking forward to seeing you next time!")
-                    break
-            elif key == book and now >= value['date return']:
-                self.administration.books[key] = Book(key, value['author'], value['genre'])
-                self.administration.write_info_library(f"{reader.name} {reader.surname} returned the book\
-                 {book} date {now} (expired)", 'a')
-                print(f"Today is {now}, which means that you are {now - value['date return']} days overdue.\
- Next time we won't give you a book for that long!")
-                break
+    def get_info_books(self):
+        for key, value in BOOKS.items():
+            self.books[key] = Book(key, value['author'], value['genre'])
 
 
 class Book:
@@ -123,55 +39,156 @@ class Book:
         return f"{self.name}: {self.author}, {self.genre} "
 
 
-class Reader:
-    def __init__(self, name, surname):
-        self.name = name
-        self.surname = surname
-        self.library_card = {}
+class LibraryCard:
+    def __init__(self, info_reader, info_book, info_return_date):
+        self.info_reader = info_reader
+        self.info_book = info_book
+        self.info_return_date = info_return_date
 
-    def add_book(self, book, date):
-        self.library_card[book.name] = {'author': book.author, 'genre': book.genre, 'date return': date}
-
-
-class Order:
-
-    def __init__(self):
-        self.name_book = str
-        self.amount_of_days = int
-
-    def create_order_book(self):
-        self.name_book = input().upper()
-
-    def create_amount_of_days(self):
-        self.amount_of_days = input()
-        try:
-            self.amount_of_days = int(self.amount_of_days)
-        except ValueError:
-            print(f"The number of days ({self.amount_of_days}) must be entered as a number. Please re-enter! ")
-            self.create_amount_of_days()
+    def __repr__(self):
+        return f"{self.info_reader}: {self.info_book}, {self.info_return_date}"
 
 
 class Administration:
-    def __init__(self, file_name):
+    def __init__(self, file_name, reader, library):
         self.file_name = file_name
-        self.books = dict()
+        self.reader = reader
+        self.library = library
+        self.order_name_book = ""
+        self.order_amount_of_days = 0
+        self.return_date = ""
+
+    def create_order_book(self):
+        self.order_name_book = input().upper()
+
+    def create_order_amount_of_days(self):
+        self.order_amount_of_days = input()
+        try:
+            self.order_amount_of_days = int(self.order_amount_of_days)
+        except ValueError:
+            print(f"The number of days ({self.order_amount_of_days}) must be entered as a number. Please re-enter! ")
+            self.create_order_amount_of_days()
 
     @staticmethod
-    def load_books():
-        return BOOKS
+    def welcome_reader():
+        print('Good day! Dear reader, in our library there are the following books:')
 
-    def parse_books(self):
-        for key, value in self.load_books().items():
-            self.books[key] = Book(key, value['author'], value['genre'])
+    def book_availability_info(self):
+        self.library.get_info_books()
+        self.write_info_library(f"{datetime.today().strftime('%A %x')} \
+ the library has the following books: \n", 'w')
+        for key, value in self.library.books.items():
+            print(f"\t{value.name}: author - {value.author}, genre - {value.genre}")
+            self.write_info_library(f"\t{value.name}: author - {value.author}, genre - {value.genre}\n",
+                                    'a')
+
+    def checking_the_availability_of_a_book(self):
+        if self.order_name_book in self.library.books:
+            return self.order_name_book
+        else:
+            return False
+
+    def calculating_the_return_period_of_a_book(self):
+        data_now = datetime.today()
+        period = timedelta(self.order_amount_of_days)
+        self.return_date = (data_now + period).date()
+
+    def communication_reader(self):
+        self.welcome_reader()
+        self.book_availability_info()
+        print(f"{self.reader.name} {self.reader.surname} what book do you want to borrow?")
+        while True:
+            self.create_order_book()
+            if self.checking_the_availability_of_a_book():
+                print('Thank you for your order. Indicate the number of days for which you want to take the book!')
+                self.create_order_amount_of_days()
+                self.calculating_the_return_period_of_a_book()
+                self.reader.take_a_book(self.library.books[self.order_name_book], self.return_date)
+                self.library.library_card[self.order_name_book] = LibraryCard(self.reader.surname,
+                                                                              self.order_name_book,
+                                                                              self.return_date)
+                del self.library.books[self.order_name_book]
+                print(f"Ok, you will need to return the book {self.return_date}")
+                self.write_info_library(f"{self.reader.name} {self.reader.surname}, took the book -\
+{self.order_name_book}. Return date - {self.return_date}\n", 'a')
+            elif self.order_name_book in self.library.library_card:
+                print(f"{self.reader.name} the book {self.order_name_book} is not in our library. It must be passed\
+ before {self.library.library_card[self.order_name_book].info_return_date}. Try to come to us after\
+ {self.library.library_card[self.order_name_book].info_return_date}! See you later ! ")
+                break
+            else:
+                print(f"{self.reader.name}, the book {self.order_name_book} is not in our library.\
+ Maybe she will appear next time. See you later!")
+                break
 
     def write_info_library(self, text, mode):
         with open(self.file_name, mode) as file:
             file.write(text)
 
+    def prolong_book(self, book):
+        book = book.upper()
+        if self.library.library_card[book].info_return_date <= self.reader.card_reader[book]['return date']:
+            print(f"Dear {self.reader.name} {self.reader.surname}, indicate how many days you want to extend the book!")
+            self.create_order_amount_of_days()
+            self.return_date = self.return_date + timedelta(self.order_amount_of_days)
+            self.reader.card_reader[book]['return date'] = self.return_date
+            print(f"Now you need to return the book no later {self.return_date}")
+            self.write_info_library(f"{self.reader.name} {self.reader.surname}, \
+ prolong the book - {book} on {self.order_amount_of_days} days. Return date - {self.return_date}\n",
+                                    'a')
+        else:
+            print(f"{self.reader.name}, We will not renew the book for you, you are overdue by\
+({(datetime.now()).date() - self.library.library_card[book].info_return_date})! You urgently need\
+ to turn in your book to the library!")
 
-administration = Administration('library')
-reader = Reader('Dmitriy', 'Lepihin')
-order = Order()
-library = Library(administration, reader, order)
-library.start_library()
-library.return_book(reader, 'it')
+    def return_book(self, book):
+        now = (datetime.now()).date()
+        book = book.upper()
+        for name_book, info in self.library.library_card.items():
+            if name_book == book and now <= info.info_return_date:
+                print(f"{self.reader.name}, maybe you want to renew the book?")
+                renewal_request = input().upper()
+                if renewal_request == 'YES':
+                    self.prolong_book(book)
+                else:
+                    self.library.books[name_book] = Book(name_book, self.reader.card_reader[book]['author'],
+                                                         self.reader.card_reader[book]['author'])
+                    self.write_info_library(f"{self.reader.name} {self.reader.surname} returned the book\
+    {book} date {now}", 'a')
+                    del self.reader.card_reader[book]
+                    del self.library.library_card[book]
+                    print(f"{self.reader.name} {self.reader.surname}, thank you for submitting the book on time.\
+ Looking forward to seeing you next time!")
+                    break
+            elif name_book == book and now >= info.info_return_date:
+                self.library.books[name_book] = Book(name_book, self.reader.card_reader[book]['author'],
+                                                     self.reader.card_reader[book]['author'])
+                del self.reader.card_reader[book]
+                del self.library.library_card[book]
+                self.write_info_library(f"{self.reader.name} {self.reader.surname} returned the book\
+                    {book} date {now} (expired)", 'a')
+                print(f"Today is {now}, which means that you are {now - info.info_return_date} days overdue.\
+ Next time we won't give you a book for that long!")
+                break
+
+
+class Reader:
+
+    def __init__(self, name, surname):
+        self.name = name
+        self.surname = surname
+        self.card_reader = {}
+
+    def take_a_book(self, book, date):
+        self.card_reader[book.name] = {'author': book.author, 'return date': date}
+
+    def __repr__(self):
+        return f"{self.name} {self.surname}"
+
+
+library = Library()
+reader = Reader('Dmitriy', 'Lepihina')
+administration = Administration('library', reader, library)
+start_library = Main(administration)
+start_library.start_library()
+start_library.administrator.return_book("it")
