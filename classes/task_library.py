@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import sqlite3 as sq
 
 BOOKS = {'THE LORD OF THE RINGS': {'author': 'John R. R. Tolkien', 'genre': 'fantasy'},
          'HARRY POTTER AND THE GOBLET OF FIRE': {'author': 'J.K. Rowling', 'genre': 'fantasy'},
@@ -65,11 +66,11 @@ class LibraryCard:
 
 
 class Administration:
-    def __init__(self, file_name):
-        self.file_name = file_name
+    def __init__(self, bd):
         self.order_name_book = ""
         self.order_amount_of_days = None
         self.return_date = ""
+        self.bd = bd
 
     def msg_welcome_reader(self):
         print('Good day! Dear reader, in our library there are the following books:')
@@ -124,10 +125,8 @@ class Administration:
 
     def book_availability_info(self, library):
         library.get_info_books()
-        self.write_info_library(f"{datetime.today().strftime('%A %x')} the library has the following books: \n", 'w')
         for key, value in library.books.items():
             print(f"\t{value.name}: author - {value.author}, genre - {value.genre}")
-            self.write_info_library(f"\t{value.name}: author - {value.author}, genre - {value.genre}\n", 'a')
 
     def checking_the_availability_of_a_book(self, library):
         if self.order_name_book in library.books and library.library_card[self.order_name_book].status:
@@ -152,9 +151,9 @@ class Administration:
                 self.calculating_the_return_period_of_a_book()
                 library.add_info_library_card(self.order_name_book, reader.get_username, self.return_date, False)
                 reader.take_a_book(self.order_name_book, library.library_card[self.order_name_book])
+                self.bd.insert_info_bd(self.order_name_book, reader.get_username,
+                                       library.library_card[self.order_name_book].status, self.return_date)
                 self.msg_data_return_book()
-                self.write_info_library(f"{reader.get_username}, took the book - {self.order_name_book}. Return date -\
-{self.return_date}\n", 'a')
             elif self.order_name_book in library.library_card and library.library_card[
                 self.order_name_book].status == False:
                 self.msg_the_book_has_already_taken(reader.get_username,
@@ -163,10 +162,6 @@ class Administration:
             else:
                 self.msg_no_book_in_library(reader.get_username)
                 break
-
-    def write_info_library(self, text, mode):
-        with open(self.file_name, mode) as file:
-            file.write(text)
 
     def prolong_book(self, book, reader, library):
         book = book.upper()
@@ -177,9 +172,8 @@ class Administration:
             self.return_date = self.return_date + timedelta(self.order_amount_of_days)
             reader.card_reader[book].info_return_date = self.return_date
             library.library_card[book].info_return_date = self.return_date
+            self.bd.update_table_info(self.return_date, book, reader.get_username)
             self.msg_data_return_book()
-            self.write_info_library(f"{reader.get_username}, prolong the book - {book} on {self.order_amount_of_days}\
- days. Return date - {self.return_date}\n", 'a')
         else:
             overdue_days = (datetime.now()).date() - library.library_card[book].info_return_date
             self.msg_not_prolong_book(reader.get_username, overdue_days)
@@ -196,13 +190,13 @@ class Administration:
                     self.prolong_book(book, reader, library)
                 else:
                     library.add_info_library_card(book)
-                    self.write_info_library(f"{reader.get_username} returned the book {book} date {now}", 'a')
                     del reader.card_reader[book]
+                    self.bd.delete_info_table(book, reader.get_username)
                     self.msg_gratitude_for_returning_book(reader.get_username)
             elif now > reader.card_reader[book].info_return_date and now > library.library_card[book].info_return_date:
                 library.add_info_library_card(book)
                 del reader.card_reader[book]
-                self.write_info_library(f"{reader.get_username} ret. the book {book} date {now} (expired)", 'a')
+                self.bd.delete_info_table(book, reader.get_username)
                 self.msg_the_late_delivery_of_the_book()
         else:
             self.msg_not_borrow_book(reader, book)
@@ -226,11 +220,48 @@ class Reader:
         return f"{self.get_username}"
 
 
+class DbSql:
+    def __init__(self, name_db):
+        self.name_db = name_db
+
+    def insert_info_bd(self, book, reader, status, date):
+        with sq.connect(self.name_db) as con:
+            cursor = con.cursor()
+            cursor.execute(f"""INSERT INTO info_book_not_library 
+                                        VALUES ('{book}', '{reader}', '{status}', '{date}') 
+                                                                                            """)
+
+    def update_table_info(self, date, book, reader):
+        with sq.connect(self.name_db) as con:
+            cursor = con.cursor()
+            cursor.execute(f"""UPDATE info_book_not_library 
+                                    SET return_date = '{date}' WHERE name_book = '{book}' AND info_reader = '{reader}' 
+                                                                                                                    """)
+
+    def delete_info_table(self, book, reader):
+        with sq.connect(self.name_db) as con:
+            cursor = con.cursor()
+            cursor.execute(f"""DELETE FROM info_book_not_library 
+                                        WHERE name_book = '{book}' AND info_reader = '{reader}' 
+                                                                                                """)
+
+    def info_book_report_db(self):
+        with sq.connect(self.name_db) as con:
+            con.row_factory = sq.Row
+            cursor = con.cursor()
+            cursor.execute("""SELECT book_library.name_book, info_book_not_library.info_reader, 
+            info_book_not_library.return_date FROM book_library 
+            JOIN info_book_not_library ON book_library.name_book = info_book_not_library.name_book 
+                                                                                                   """)
+            for info in cursor:
+                print(info['name_book'], info['info_reader'], info['return_date'])
+
+
 my_library = Library()
-my_administration = Administration('books_report')
+my_db = DbSql('books_report.db')
+my_administration = Administration(my_db)
 my_reader = Reader('Dmitriy', 'Lepihin')
 start_library = Main(my_administration, my_library, my_reader)
 start_library.start_library()
-print(my_reader.card_reader)
-print(my_library.library_card)
 start_library.start_return_book('it')
+my_db.info_book_report_db()
