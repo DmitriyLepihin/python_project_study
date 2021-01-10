@@ -66,11 +66,11 @@ class LibraryCard:
 
 
 class Administration:
-    def __init__(self, bd):
+    def __init__(self, db):
         self.order_name_book = ""
         self.order_amount_of_days = None
         self.return_date = ""
-        self.bd = bd
+        self.db = db
 
     def msg_welcome_reader(self):
         print('Good day! Dear reader, in our library there are the following books:')
@@ -151,7 +151,7 @@ class Administration:
                 self.calculating_the_return_period_of_a_book()
                 library.add_info_library_card(self.order_name_book, reader.get_username, self.return_date, False)
                 reader.take_a_book(self.order_name_book, library.library_card[self.order_name_book])
-                self.bd.insert_info_bd(self.order_name_book, reader.get_username,
+                self.db.insert_info_bd(self.order_name_book, reader.get_username,
                                        library.library_card[self.order_name_book].status, self.return_date)
                 self.msg_data_return_book()
             elif self.order_name_book in library.library_card and library.library_card[
@@ -172,7 +172,7 @@ class Administration:
             self.return_date = self.return_date + timedelta(self.order_amount_of_days)
             reader.card_reader[book].info_return_date = self.return_date
             library.library_card[book].info_return_date = self.return_date
-            self.bd.update_table_info(self.return_date, book, reader.get_username)
+            self.db.update_table_info(self.return_date, book, reader.get_username)
             self.msg_data_return_book()
         else:
             overdue_days = (datetime.now()).date() - library.library_card[book].info_return_date
@@ -191,12 +191,12 @@ class Administration:
                 else:
                     library.add_info_library_card(book)
                     del reader.card_reader[book]
-                    self.bd.delete_info_table(book, reader.get_username)
+                    self.db.delete_info_table(book, reader.get_username)
                     self.msg_gratitude_for_returning_book(reader.get_username)
             elif now > reader.card_reader[book].info_return_date and now > library.library_card[book].info_return_date:
                 library.add_info_library_card(book)
                 del reader.card_reader[book]
-                self.bd.delete_info_table(book, reader.get_username)
+                self.db.delete_info_table(book, reader.get_username)
                 self.msg_the_late_delivery_of_the_book()
         else:
             self.msg_not_borrow_book(reader, book)
