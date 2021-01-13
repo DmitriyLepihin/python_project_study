@@ -26,10 +26,7 @@ class Library:
         self.books = {}
 
     def get_info_books(self, db):
-        book_db = db.get_info_table_book()
-        for info in book_db:
-            self.books[info['name']] = Book(info['name'], info['author'], info['genre'])
-            self.library_card[info['name']] = LibraryCard(info['name'], info['book_id'])
+        db.get_info_table_book(self.library_card, self.books)
 
     def add_info_library_card(self, book, name_reader="", date=None, status=True):
         self.library_card[book].info_reader = name_reader
@@ -145,7 +142,8 @@ class Administration:
                 library.add_info_library_card(self.order_name_book, reader.get_username, self.return_date, False)
                 reader.take_a_book(self.order_name_book, library.library_card[self.order_name_book])
                 db.insert_table_info_lib_card(library.library_card[self.order_name_book].book_id, reader.user_id,
-                                              self.return_date)
+                                              self.return_date, False)
+                db.update_column_book_is_missing(library.library_card[self.order_name_book].book_id)
                 self.msg_data_return_book()
             elif self.order_name_book in library.library_card and library.library_card[
                 self.order_name_book].status == False:
@@ -184,12 +182,12 @@ class Administration:
                 else:
                     library.add_info_library_card(book)
                     del reader.card_reader[book]
-                    db.delete_info_table_lib_card(library.library_card[book].book_id, reader.user_id)
+                    db.update_column_is_deleted_and_book_is_missing(library.library_card[book].book_id, reader.user_id)
                     self.msg_gratitude_for_returning_book(reader.get_username)
             elif now > reader.card_reader[book].info_return_date and now > library.library_card[book].info_return_date:
                 library.add_info_library_card(book)
                 del reader.card_reader[book]
-                db.delete_info_table_lib_card(library.library_card[book].book_id, reader.user_id)
+                db.update_column_is_deleted_and_book_is_missing(library.library_card[book].book_id, reader.user_id)
                 self.msg_the_late_delivery_of_the_book()
         else:
             self.msg_not_borrow_book(reader, book)
@@ -228,36 +226,37 @@ class DbSql:
     def insert_table_users(self, full_name, address, phone):
         with sq.connect(self.name_db) as con:
             cursor = con.cursor()
-            cursor.execute(f"""INSERT INTO users (full_name, address, phone)
-                               VALUES ('{full_name}', '{address}', '{phone}') """)
+            cursor.execute(f""" INSERT INTO users (full_name, address, phone)
+                                VALUES ('{full_name}', '{address}', '{phone}') """)
 
-    def insert_table_info_lib_card(self, book, date, reader):
+    def insert_table_info_lib_card(self, book, date, reader, status):
         with sq.connect(self.name_db) as con:
             cursor = con.cursor()
-            cursor.execute(F"""INSERT INTO info_library_card (book_id, user_id, return_date) 
-                               VALUES('{book}','{date}', '{reader}') """)
+            cursor.execute(F""" INSERT INTO info_library_card VALUES('{book}','{date}', '{reader}', '{status}') """)
 
-    def delete_info_table_lib_card(self, book, reader):
-        with sq.connect(self.name_db) as con:
-            cursor = con.cursor()
-            cursor.execute(f"""DELETE FROM info_library_card WHERE book_id = '{book}' AND user_id = '{reader}' """)
-
-    def get_info_table_book(self):
+    def get_info_table_book(self, library_card, books):
         with sq.connect(self.name_db) as con:
             con.row_factory = sq.Row
             cursor = con.cursor()
-            cursor.execute("""SELECT * FROM book""")
-            return cursor
+            cursor.execute(""" SELECT * FROM book WHERE book_is_missing LIKE 'False' """)
+            for book in cursor:
+                books[book['name']] = Book(book['name'], book['author'], book['genre'])
+                library_card[book['name']] = LibraryCard(book['name'], book['book_id'])
+
+    def update_column_book_is_missing(self, book):
+        with sq.connect(self.name_db) as con:
+            cursor = con.cursor()
+            cursor.execute(f""" UPDATE book SET book_is_missing = 'True' WHERE book_id = '{book}' """)
 
     def get_info_user_id(self, reader):
         with sq.connect(self.name_db) as con:
             con.row_factory = sq.Row
             cursor = con.cursor()
-            cursor.execute(f"""SELECT user_id FROM users WHERE full_name = '{reader.get_username}' """)
+            cursor.execute(f""" SELECT user_id FROM users WHERE full_name = '{reader.get_username}' """)
             user_id = cursor.fetchone()
             if user_id is None:
                 self.insert_table_users(reader.get_username, reader.address, reader.phone)
-                cursor.execute("""SELECT * FROM users""")
+                cursor.execute(""" SELECT * FROM users """)
                 reader.add_user_id(cursor)
             else:
                 reader.user_id = user_id['user_id']
@@ -265,24 +264,43 @@ class DbSql:
     def update_table_info_library_card(self, date, book, reader):
         with sq.connect(self.name_db) as con:
             cursor = con.cursor()
-            cursor.execute(f"""UPDATE info_library_card 
-                                    SET return_date = '{date}' WHERE book_id = '{book}' AND user_id = '{reader}' """)
+            cursor.execute(f""" UPDATE info_library_card 
+                                SET return_date = '{date}' WHERE book_id = '{book}' AND user_id = '{reader}' """)
 
     def get_data_library_info_card(self):
         with sq.connect(self.name_db) as con:
             con.row_factory = sq.Row
             cursor = con.cursor()
-            cursor.execute("""SELECT name, users.full_name, info_library_card.return_date FROM book, users 
-                                JOIN info_library_card ON info_library_card.book_id = book.book_id 
-                                AND info_library_card.user_id = users.user_id""")
+            cursor.execute(""" SELECT name, users.full_name, info_library_card.return_date FROM book, users 
+                               JOIN info_library_card ON info_library_card.book_id = book.book_id 
+                               AND info_library_card.user_id = users.user_id 
+                               AND info_library_card.is_deleted LIKE 'False' """)
             for info in cursor:
                 print(f" BOOK: '{info['name']}' took  {info['full_name']}, return_date: {info['return_date']}")
+
+    def update_column_is_deleted_and_book_is_missing(self, book, reader):
+        connect = None
+        try:
+            connect = sq.connect(self.name_db)
+            cursor = connect.cursor()
+
+            cursor.executescript(f""" BEGIN;
+                                      UPDATE book SET book_is_missing = 'False' WHERE book_id = '{book}'; 
+                                      UPDATE info_library_card SET is_deleted = 'True' 
+                                      WHERE book_id = '{book}' AND user_id = '{reader}' 
+                                    """)
+            connect.commit()
+        except sq.Error:
+            if connect: connect.rollback()
+            print('No database connection!')
+        finally:
+            if connect: connect.close()
 
 
 my_db = DbSql('library.db')
 my_library = Library()
 my_administration = Administration()
-my_reader = Reader('Dmitriy', 'Lepihin', 'ul. Chkalova 24-2-59', '+375292900054')
+my_reader = Reader('Marina', 'Lepihina', 'ul. Chkalova 24-2-59', '+375295955760')
 start_library = Main(my_administration, my_library, my_reader, my_db)
 start_library.start_library()
 start_library.start_return_book('it')
