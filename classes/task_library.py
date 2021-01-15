@@ -10,7 +10,7 @@ class Main:
         self.db = db
 
     def start_library(self):
-        self.db.get_info_user_id(self.reader)
+        self.reader.add_user_id(self.db)
         self.administrator.communication_reader(self.reader, self.library, self.db)
 
     def start_return_book(self, book):
@@ -19,19 +19,28 @@ class Main:
     def start_prolong_book(self, book):
         self.administrator.prolong_book(book, self.reader, self.library, self.db)
 
+    def start_info_missing_books(self):
+        self.library.get_info_unavailable_books(self.db)
+
 
 class Library:
     def __init__(self):
         self.library_card = {}
         self.books = {}
 
-    def get_info_books(self, db):
-        db.get_info_table_book(self.library_card, self.books)
+    def get_info_books(self, books):
+        for book in books:
+            self.books[book['name']] = Book(book['name'], book['author'], book['genre'])
+            self.library_card[book['name']] = LibraryCard(book['name'], book['book_id'])
 
     def add_info_library_card(self, book, name_reader="", date=None, status=True):
         self.library_card[book].info_reader = name_reader
         self.library_card[book].info_return_date = date
         self.library_card[book].status = status
+
+    def get_info_unavailable_books(self, db):
+        for info in db.get_data_library_info_card():
+            print(f" BOOK: '{info['name']}' took  {info['full_name']}, return_date: {info['return_date']}")
 
 
 class Book:
@@ -102,6 +111,9 @@ class Administration:
     def msg_not_borrow_book(self, reader, book):
         print(f"{reader.get_username}, you did not borrow the book {book} from our library!")
 
+    def msg_unconfirmed_order(self, reader):
+        print(f"{reader}, you have already taken {self.order_name_book} for reading. Try to place your order again!")
+
     def create_order_book(self):
         self.order_name_book = input().upper()
 
@@ -114,12 +126,12 @@ class Administration:
             self.create_order_amount_of_days()
 
     def book_availability_info(self, library, db):
-        library.get_info_books(db)
+        library.get_info_books(db.get_info_table_book())
         for key, value in library.books.items():
             print(f"\t{value.name}: author - {value.author}, genre - {value.genre}")
 
     def checking_the_availability_of_a_book(self, library):
-        if self.order_name_book in library.books and library.library_card[self.order_name_book].status:
+        if self.order_name_book in library.books:
             return True
         else:
             return False
@@ -135,6 +147,9 @@ class Administration:
         self.msg_what_available(reader.get_username)
         while True:
             self.create_order_book()
+            if reader.card_reader.get(self.order_name_book):
+                self.msg_unconfirmed_order(reader.get_username)
+                continue
             if self.checking_the_availability_of_a_book(library):
                 self.msg_number_of_days_of_order()
                 self.create_order_amount_of_days()
@@ -145,10 +160,10 @@ class Administration:
                                               self.return_date, False)
                 db.update_column_book_is_missing(library.library_card[self.order_name_book].book_id)
                 self.msg_data_return_book()
-            elif self.order_name_book in library.library_card and library.library_card[
-                self.order_name_book].status == False:
+            elif db.check_return_date_missing_book(self.order_name_book) is not None:
                 self.msg_the_book_has_already_taken(reader.get_username,
-                                                    library.library_card[self.order_name_book].info_return_date)
+                                                    db.check_return_date_missing_book(self.order_name_book)
+                                                    ['return_date'])
                 break
             else:
                 self.msg_no_book_in_library(reader.get_username)
@@ -182,12 +197,12 @@ class Administration:
                 else:
                     library.add_info_library_card(book)
                     del reader.card_reader[book]
-                    db.update_column_is_deleted_and_book_is_missing(library.library_card[book].book_id, reader.user_id)
+                    db.update_status_book(library.library_card[book].book_id, reader.user_id)
                     self.msg_gratitude_for_returning_book(reader.get_username)
             elif now > reader.card_reader[book].info_return_date and now > library.library_card[book].info_return_date:
                 library.add_info_library_card(book)
                 del reader.card_reader[book]
-                db.update_column_is_deleted_and_book_is_missing(library.library_card[book].book_id, reader.user_id)
+                db.update_status_book(library.library_card[book].book_id, reader.user_id)
                 self.msg_the_late_delivery_of_the_book()
         else:
             self.msg_not_borrow_book(reader, book)
@@ -204,9 +219,13 @@ class Reader:
         self.user_id = None
 
     def add_user_id(self, db):
-        for user_id in db:
-            if user_id['full_name'] == self.get_username:
-                self.user_id = user_id['user_id']
+        if db.get_info_user_id(self.get_username) is None:
+            db.insert_table_users(self.get_username, self.address, self.phone)
+            for user_id in db.insert_table_users():
+                if user_id['full_name'] == self.get_username:
+                    self.user_id = user_id['user_id']
+        else:
+            self.user_id = db.get_info_user_id(self.get_username)['user_id']
 
     def take_a_book(self, book, library_card):
         self.card_reader[book] = library_card
@@ -229,19 +248,24 @@ class DbSql:
             cursor.execute(f""" INSERT INTO users (full_name, address, phone)
                                 VALUES ('{full_name}', '{address}', '{phone}') """)
 
+    def select_users(self):
+        with sq.connect(self.name_db) as con:
+            con.row_factory = sq.Row
+            cursor = con.cursor()
+            cursor.execute(""" SELECT * FROM users """)
+            return cursor
+
     def insert_table_info_lib_card(self, book, date, reader, status):
         with sq.connect(self.name_db) as con:
             cursor = con.cursor()
             cursor.execute(F""" INSERT INTO info_library_card VALUES('{book}','{date}', '{reader}', '{status}') """)
 
-    def get_info_table_book(self, library_card, books):
+    def get_info_table_book(self):
         with sq.connect(self.name_db) as con:
             con.row_factory = sq.Row
             cursor = con.cursor()
             cursor.execute(""" SELECT * FROM book WHERE book_is_missing LIKE 'False' """)
-            for book in cursor:
-                books[book['name']] = Book(book['name'], book['author'], book['genre'])
-                library_card[book['name']] = LibraryCard(book['name'], book['book_id'])
+            return cursor
 
     def update_column_book_is_missing(self, book):
         with sq.connect(self.name_db) as con:
@@ -252,14 +276,9 @@ class DbSql:
         with sq.connect(self.name_db) as con:
             con.row_factory = sq.Row
             cursor = con.cursor()
-            cursor.execute(f""" SELECT user_id FROM users WHERE full_name = '{reader.get_username}' """)
+            cursor.execute(f""" SELECT user_id FROM users WHERE full_name = '{reader}' """)
             user_id = cursor.fetchone()
-            if user_id is None:
-                self.insert_table_users(reader.get_username, reader.address, reader.phone)
-                cursor.execute(""" SELECT * FROM users """)
-                reader.add_user_id(cursor)
-            else:
-                reader.user_id = user_id['user_id']
+            return user_id
 
     def update_table_info_library_card(self, date, book, reader):
         with sq.connect(self.name_db) as con:
@@ -275,10 +294,9 @@ class DbSql:
                                JOIN info_library_card ON info_library_card.book_id = book.book_id 
                                AND info_library_card.user_id = users.user_id 
                                AND info_library_card.is_deleted LIKE 'False' """)
-            for info in cursor:
-                print(f" BOOK: '{info['name']}' took  {info['full_name']}, return_date: {info['return_date']}")
+            return cursor
 
-    def update_column_is_deleted_and_book_is_missing(self, book, reader):
+    def update_status_book(self, book, reader):
         connect = None
         try:
             connect = sq.connect(self.name_db)
@@ -296,11 +314,22 @@ class DbSql:
         finally:
             if connect: connect.close()
 
+    def check_return_date_missing_book(self, book):
+        with sq.connect(self.name_db) as con:
+            con.row_factory = sq.Row
+            cursor = con.cursor()
+            cursor.execute(f""" SELECT return_date FROM info_library_card 
+                                WHERE book_id = (SELECT book_id FROM book WHERE name LIKE '{book}' 
+                                AND book_is_missing = 'True') 
+                                AND is_deleted LIKE 'False' """)
+            return_date = cursor.fetchone()
+            return return_date
+
 
 my_db = DbSql('library.db')
 my_library = Library()
 my_administration = Administration()
-my_reader = Reader('Marina', 'Lepihina', 'ul. Chkalova 24-2-59', '+375295955760')
+my_reader = Reader('Dmitriy', 'Lepihin', 'ul. Chkalova 24-2-59', '+375292900054')
 start_library = Main(my_administration, my_library, my_reader, my_db)
 start_library.start_library()
 start_library.start_return_book('it')
