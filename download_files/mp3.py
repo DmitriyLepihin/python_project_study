@@ -43,6 +43,8 @@ def download_mp3(urls):
         if req.status_code == requests.codes.ok:
             with open(f"D:\\golangshow\\golangshow{urls.index(url_address)}.mp3", 'wb') as f:
                 f.write(req.content)
+        else:
+            print(f"Not connection url {url_address}")
 
 
 download_mp3(my_urls)
