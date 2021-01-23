@@ -18,9 +18,10 @@ class Library:
         self.library_card = {}
         self.books = {}
 
-    def add_info_library_card(self, book_id, id_reader=None, date=None, status=False):
+    def add_info_library_card(self, book_id, id_reader=None, date=None, taking_date=None, status=False):
         self.library_card[book_id].id_reader = id_reader
         self.library_card[book_id].info_return_date = date
+        self.library_card[book_id].info_taking_date = taking_date
         self.library_card[book_id].deleted_status = status
 
     def get_info_books(self, db):
@@ -39,6 +40,7 @@ class LibraryCard:
         self.id_reader = None
         self.deleted_status = True
         self.info_return_date = None
+        self.info_taking_date = None
 
     def __repr__(self):
         return f"  {self.name_book} {self.book_id} {self.id_reader} {self.deleted_status} {self.info_return_date}"
@@ -119,9 +121,9 @@ class Administration:
     def msg_successfully_registered(self, full_name, user_id):
         print(f"{full_name} you have successfully registered, your ID - {user_id}")
 
-    def msg_overdue_book(self, reader, book):
-        print(f"""{reader}, you have the overdue book ({book}), to take new book you must return the overdue book!
-Will you return the book?""")
+    def msg_overdue_book(self, reader, book, book_id):
+        print(f"""{reader}, you have the overdue book ({book} - ID BOOK - {book_id}), 
+to take new book you must return the overdue book! Will you return the book?""")
 
     def msg_must_return_the_book(self, reader):
         print(f"{reader} if you want to take anew book, you must return overdue book!")
@@ -141,11 +143,12 @@ Will you return the book?""")
     def msg_not_return_the_books(self, reader):
         print(f"{reader}, you do not return the following books. ")
 
-    def msg_want_return_book(self):
-        print("Do you want return book ?")
+    def msg_want_return_book_or_prolong(self):
+        print("You have books you haven returned. Enter (1) if you want to prolong, enter (2) if you want to return!\
+Enter (3) if continue! ")
 
     def msg_want_prolong_book(self):
-        print("Do you want prolong book ?")
+        print("You have books you haven returned. Do you want to prolong ? ")
 
     def msg_enter_book_id_prolong(self):
         print("Enter the id book you want to prolong...")
@@ -214,11 +217,13 @@ Will you return the book?""")
         if info_join_table:
             for info in info_join_table:
                 library.library_card[info['book_id']] = LibraryCard(info['name'], info['book_id'])
-                library.add_info_library_card(info['book_id'], info['user_id'], info['return_date'], info['is_deleted'])
+                library.add_info_library_card(info['book_id'], info['user_id'], info['return_date'],
+                                              info['date_taking'], info['is_deleted'])
                 reader.add_info_card(info['book_id'], library.library_card[info['book_id']])
                 if self.date_now > datetime.strptime(library.library_card[info['book_id']].info_return_date,
                                                      '%Y-%m-%d').date():
-                    self.msg_overdue_book(reader.get_username, library.library_card[info['book_id']].name_book)
+                    self.msg_overdue_book(reader.get_username, library.library_card[info['book_id']].name_book,
+                                          info['book_id'])
                     answer = input().upper()
                     if answer == 'YES':
                         self.return_book(reader, db, library)
@@ -244,19 +249,31 @@ Will you return the book?""")
 
     def check_card_reader(self, library, reader, db):
         while True:
+            books_taken_earlier = {}
+            books_taken_today = {}
             if reader.card_reader:
-                self.msg_not_return_the_books(reader.get_username)
                 for key, value in reader.card_reader.items():
-                    if value.deleted_status == 'False':
+                    if self.date_now != datetime.strptime(value.info_taking_date, '%Y-%m-%d').date():
+                        books_taken_earlier[key] = value
+                    else:
+                        books_taken_today[key] = value
+                if books_taken_earlier and reader.card_reader:
+                    for key, value in reader.card_reader.items():
                         print(f"ID: {key} book - {value.name_book} return date: {value.info_return_date}")
-                self.msg_want_return_book()
-                answer = input().upper()
-                if answer == 'YES':
-                    self.return_book(reader, db, library)
-                elif answer != "YES":
+                    self.msg_want_return_book_or_prolong()
+                    answer = input()
+                    if answer == '1':
+                        self.prolong_book(library, db, reader)
+                    elif answer == '2':
+                        self.return_book(reader, db, library)
+                    else:
+                        break
+                elif books_taken_today and reader.card_reader:
+                    for key, value in reader.card_reader.items():
+                        print(f"ID: {key} book - {value.name_book} return date: {value.info_return_date}")
                     self.msg_want_prolong_book()
-                    answer_two = input().upper()
-                    if answer_two == 'YES':
+                    answer = input().upper()
+                    if answer == 'YES':
                         self.prolong_book(library, db, reader)
                     else:
                         break
@@ -284,6 +301,7 @@ Will you return the book?""")
             self.msg_prolong_successfully(reader.get_username,
                                           library.library_card[self.order_id_book].info_return_date)
             db.update_table_info_library_card(self.return_date, self.order_id_book, reader.user_id)
+            reader.del_info_card_reader(self.order_id_book)
         else:
             self.msg_about_wrong_book_id(self.order_id_book)
             self.prolong_book(library, db, reader)
@@ -313,6 +331,14 @@ Will you return the book?""")
         period = timedelta(self.order_amount_of_days)
         self.return_date = (data_now + period).date()
 
+    def proposal_to_take_book(self, reader):
+        print(f"{reader} do you want to take one more book ?")
+        answer = input().upper()
+        if answer == "YES":
+            return True
+        else:
+            return False
+
     def offer_to_take_books(self, reader, library, db):
         self.msg_to_take_the_book(reader.get_username)
         answer = input().upper()
@@ -326,13 +352,28 @@ Will you return the book?""")
                     self.msg_number_of_days()
                     self.create_order_amount_of_days()
                     self.calculating_the_return_period_of_a_book()
-                    db.insert_table_info_lib_card(self.order_id_book, reader.user_id, self.return_date, False)
+                    db.insert_table_info_lib_card(self.order_id_book, reader.user_id, self.return_date, False,
+                                                  self.date_now)
                     db.update_column_book_is_missing(self.order_id_book)
-                    library.add_info_library_card(self.order_id_book, reader.user_id, self.return_date)
+                    library.add_info_library_card(self.order_id_book, reader.user_id, self.return_date,
+                                                  self.date_now)
                     self.msg_order_completed(reader.get_username, self.return_date)
+                    if self.proposal_to_take_book(reader.get_username):
+                        self.book_availability_info(library, db)
+                        continue
+                    else:
+                        self.msg_goodbye()
+                        reader.card_reader = {}
+                        self.communication_reader(reader, library, db)
                 elif db.check_return_date_missing_book(self.order_id_book):
                     self.msg_book_not_library(db.check_return_date_missing_book(self.order_id_book)['return_date'])
-                    self.offer_to_take_books(reader, library, db)
+                    if self.proposal_to_take_book(reader.get_username):
+                        self.book_availability_info(library, db)
+                        continue
+                    else:
+                        self.msg_goodbye()
+                        reader.card_reader = {}
+                        self.communication_reader(reader, library, db)
                 else:
                     self.msg_not_book_id(self.order_id_book)
                     continue
@@ -385,7 +426,7 @@ class DbSql:
             con.row_factory = sq.Row
             cursor = con.cursor()
             cursor.execute(f""" SELECT name, book.book_id, info_library_card.user_id, 
-                                info_library_card.is_deleted, return_date FROM book 
+                                info_library_card.is_deleted, return_date, date_taking FROM book 
                                 JOIN info_library_card ON info_library_card.book_id = book.book_id 
                                 AND info_library_card.user_id = '{user_id}' 
                                 AND info_library_card.is_deleted LIKE 'False'
@@ -423,10 +464,11 @@ class DbSql:
             cursor.execute(""" SELECT * FROM book WHERE book_is_missing LIKE 'False' """)
             return cursor
 
-    def insert_table_info_lib_card(self, book, date, reader, status):
+    def insert_table_info_lib_card(self, book, date, reader, status, date_taking):
         with sq.connect(self.name_db) as con:
             cursor = con.cursor()
-            cursor.execute(F""" INSERT INTO info_library_card VALUES('{book}','{date}', '{reader}', '{status}') """)
+            cursor.execute(F""" INSERT INTO info_library_card 
+                                            VALUES('{book}','{date}', '{reader}', '{status}', '{date_taking}') """)
 
     def update_column_book_is_missing(self, book):
         with sq.connect(self.name_db) as con:
