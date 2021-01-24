@@ -128,9 +128,6 @@ to take new book you must return the overdue book! Will you return the book?""")
     def msg_must_return_the_book(self, reader):
         print(f"{reader} if you want to take anew book, you must return overdue book!")
 
-    def msg_accepted_the_book(self):
-        print("This time we accepted the book. Be careful next time!")
-
     def msg_enter_book_id(self):
         print("Enter the id book you want to return...")
 
@@ -139,9 +136,6 @@ to take new book you must return the overdue book! Will you return the book?""")
 
     def msg_about_wrong_book_id(self, book_id):
         print(f"You have entered the id of the book ({book_id}) incorrectly, be careful!")
-
-    def msg_not_return_the_books(self, reader):
-        print(f"{reader}, you do not return the following books. ")
 
     def msg_want_return_book_or_prolong(self):
         print("You have books you haven returned. Enter (1) if you want to prolong, enter (2) if you want to return!\
@@ -175,7 +169,7 @@ Enter (3) if continue! ")
         print(f"{reader}, the order completes, need to be returned: {date}")
 
     def msg_book_not_library(self, date):
-        print(f"The book is not in the library, it will appear: {date}. See you later")
+        print(f"The book is not in the library, it will appear: {date}.")
 
     def msg_not_book_id(self, book_id):
         print(f"You confused something, this id ({book_id}) was not found, please try to repeat the order")
@@ -249,15 +243,15 @@ Enter (3) if continue! ")
 
     def check_card_reader(self, library, reader, db):
         while True:
-            books_taken_earlier = {}
-            books_taken_today = {}
+            books_taken_earlier = 0
+            books_taken_today = 0
             if reader.card_reader:
                 for key, value in reader.card_reader.items():
                     if self.date_now != datetime.strptime(value.info_taking_date, '%Y-%m-%d').date():
-                        books_taken_earlier[key] = value
+                        books_taken_earlier += 1
                     else:
-                        books_taken_today[key] = value
-                if books_taken_earlier and reader.card_reader:
+                        books_taken_today += 1
+                if books_taken_earlier >= 1 and reader.card_reader:
                     for key, value in reader.card_reader.items():
                         print(f"ID: {key} book - {value.name_book} return date: {value.info_return_date}")
                     self.msg_want_return_book_or_prolong()
@@ -268,7 +262,7 @@ Enter (3) if continue! ")
                         self.return_book(reader, db, library)
                     else:
                         break
-                elif books_taken_today and reader.card_reader:
+                elif books_taken_today >= 1 and reader.card_reader:
                     for key, value in reader.card_reader.items():
                         print(f"ID: {key} book - {value.name_book} return date: {value.info_return_date}")
                     self.msg_want_prolong_book()
