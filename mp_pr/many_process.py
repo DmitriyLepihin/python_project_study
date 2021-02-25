@@ -1,5 +1,3 @@
-import random
-import string
 import requests
 from multiprocessing import Pool, cpu_count
 from functools import partial

@@ -1,4 +1,3 @@
-import random
 import concurrent.futures
 import requests
 from multiprocessing import Pool, cpu_count
