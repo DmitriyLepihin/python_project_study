@@ -1,6 +1,4 @@
 from datetime import datetime
-import json
-from product_shop.shop_version_one.utils import PATH_FILE
 from product_shop.shop_version_two.account import Account
 from product_shop.shop_version_two.customer import Customer
 from product_shop.shop_version_two.order import Order
