@@ -1,8 +1,8 @@
 import requests
 import concurrent.futures
 
-from mp_pr import urls
-from mp_pr.utils import timing, clear_photos_directory
+from multiprocessing import urls
+from multiprocessing.utils import timing, clear_photos_directory
 
 clear_photos_directory()
 

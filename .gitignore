@@ -2,4 +2,4 @@ venv/
 .idea/
 product_shop/shop_version_one/account
 product_shop/shop_version_two/account
-mp_pr/photos
+multiprocessing/photos

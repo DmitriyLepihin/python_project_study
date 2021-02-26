@@ -1,10 +1,10 @@
 import concurrent.futures
 import requests
 from multiprocessing import Pool, cpu_count
-from mp_pr.utils import chunks
+from multiprocessing.utils import chunks
 
-from mp_pr import urls
-from mp_pr.utils import clear_photos_directory, timing
+from multiprocessing import urls
+from multiprocessing.utils import clear_photos_directory, timing
 
 clear_photos_directory()
 

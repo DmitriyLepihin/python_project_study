@@ -1,7 +1,7 @@
 import requests
 
-from mp_pr import urls
-from mp_pr.utils import clear_photos_directory, timing
+from multiprocessing import urls
+from multiprocessing.utils import clear_photos_directory, timing
 
 clear_photos_directory()
 
