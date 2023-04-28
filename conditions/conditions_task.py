@@ -11,7 +11,7 @@ for i in a:
 # словарем и добавить в них новый ключ “a”: “new key”
 a = [1, 'a', [1, 2, 3], {1: 2}, (1, 2, 3,), {'a': 'old key'}]
 for elem in a:
-    if type(elem) == dict:
+    if isinstance(elem, dict):
         elem.update({'a': 'new key'})
 print(a)
 
